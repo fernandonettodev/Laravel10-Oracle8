@@ -28,7 +28,7 @@ composer require laravel/sail --dev
 
 ### 3. Baixar a Pasta do Instant Client
 
-Baixe a pasta do Oracle Instant Client (link aqui) e coloque na raiz do projeto. A estrutura deve ficar assim:
+Baixe a pasta do Oracle Instant Client (que está dentro deste projeto) e coloque na raiz do projeto. A estrutura deve ficar assim:
 
 ```
 projeto/
@@ -36,6 +36,8 @@ projeto/
 │   └── instantclient_21_7/
 └── ...
 ```
+
+(Fique a vontade para usar a versão que melhor quiser do instant client, estou usando a 21_7 pois ser a mais estavel pra configurar)
 
 ### 4. Criar o `docker-compose.yml`
 
