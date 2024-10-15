@@ -125,7 +125,29 @@ Na raiz do projeto, execute o comando:
 
 Espere o processo de build ser concluído.
 
-### 7. Usar o Sail
+### 7. Instale os pacotes do Yajra pra identificar o banco oracle:
+```bash
+composer require yajra/laravel-datatables-oracle:"^11"
+```
+e
+```bash
+composer require yajra/laravel-oci8": "^10.0
+```
+
+após isso adicione no config/app.php:
+
+providers:
+```bash
+Yajra\DataTables\DataTablesServiceProvider::class,
+Yajra\Oci8\Oci8ServiceProvider::class,
+```
+
+aliases: 
+```bash
+'DataTables' => Yajra\DataTables\Facades\DataTables::class,
+```
+
+### 8. Usar o Sail
 
 Agora, para executar comandos Artisan e outros comandos do Laravel, você deve preceder os comandos com `./vendor/bin/sail`. Por exemplo, para rodar as migrações, use:
 
