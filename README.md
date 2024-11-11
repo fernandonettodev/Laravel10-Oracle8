@@ -28,7 +28,7 @@ composer require laravel/sail --dev
 
 ### 3. Baixar a Pasta do Docker que tem o Instant Client
 
-Baixe a pasta docker ([Aqui](https://drive.google.com/file/d/1Ks4LVjXE1POQ8vjy9WYqPE5EFnwPl4to/view?usp=drive_link)) e coloque na raiz do projeto. A estrutura deve ficar assim:
+Baixe a pasta docker ([Aqui](https://drive.google.com/file/d/1iegjFY2ESUUM4XUGFEKLbkWcPrIDdTr_/view?usp=sharing)) e coloque na raiz do projeto. A estrutura deve ficar assim:
 
 ```
 projeto/
