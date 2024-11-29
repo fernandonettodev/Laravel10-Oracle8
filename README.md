@@ -1,6 +1,6 @@
 # Configuração do Projeto Laravel com DB Oracle, Sail, Redis e PostgreSQL
 
-Este guia irá ajudá-lo a configurar seu projeto Laravel 10 para usar o banco de dados Oracle com PHP 8.1, Sail, Redis e PostgreSQL.
+Este guia irá ajudá-lo a configurar seu projeto Laravel para usar o banco de dados Oracle com PHP 8.1, Sail, Redis e PostgreSQL.
 
 ## Pré-requisitos
 
@@ -69,6 +69,7 @@ services:
         depends_on:
             - pgsql
             - redis
+            - oracle
 
     pgsql:
         image: 'postgres:${POSTGRES_VERSION:-15}'
@@ -87,6 +88,22 @@ services:
             retries: 3
             timeout: 5s
 
+    oracle:
+        image: gvenzl/oracle-xe
+        container_name: oracle_db
+        ports:
+            - "1521:1521"
+            - "5500:5500"  
+        environment:
+            ORACLE_PASSWORD: '${ORACLE_PASSWORD:-oracle}'
+            ORACLE_USER: '${ORACLE_USER:-system}'
+            ORACLE_PDB: '${ORACLE_PDB:-XE}'
+        networks:
+            - sail
+        volumes:
+            - oracle-data:/opt/oracle/oradata
+        restart: always
+
     redis:
         image: 'redis:alpine'
         ports:
@@ -96,15 +113,17 @@ services:
         networks:
             - sail
         healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
-            retries: 3
-            timeout: 5s
+            test: ["CMD-SHELL", "echo 'SELECT 1 FROM DUAL;' | sqlplus -s system/${ORACLE_PASSWORD}@localhost:1521/XEPDB1"]
+            interval: 30s
+            timeout: 10s
+            retries: 10
 
 networks:
     sail:
         driver: bridge
 
 volumes:
+    oracle-data:
     sail-pgsql:
         driver: local
     sail-redis:
@@ -113,19 +132,53 @@ volumes:
 
 Sinta-se à vontade para adicionar outros serviços que você precise, como Memcached, Selenium, etc.
 
-### 5. Configurar o Acesso ao Banco Oracle
+### 5. Configurar o Acesso ao Banco Oracle local e ou Sandbox
 
-Coloque os dados de acesso do seu Banco Oracle na pasta `docker/instantclient_21_7/network/admin`.
+No local apenas use as credenciais no .env:
+
+```yaml
+DB_CONNECTION=oracle
+DB_HOST=oracle
+DB_PORT=1521
+DB_DATABASE=XE
+DB_USERNAME=system
+DB_PASSWORD=oracle
+ORACLE_PASSWORD=oracle
+```
+
+Agora se for um banco Sandbox ou Produção:
+
+Coloque os dados da wallet de acesso do seu Banco Oracle na pasta `docker/instantclient/network/admin`.
+e cadastre os dados no seu .env:
+
+```yaml
+# DB_CONNECTION=oracle
+# DB_HOST=
+# DB_PORT=
+# DB_SERVICE_NAME=
+# DB_DATABASE=
+# DB_USERNAME= 
+# DB_PASSWORD=
+# DB_TNS=
+# TNS_ADMIN=/opt/oracle/instantclient/network/admin/
+# YAJRA_PDO_OCI_DEFAULT=0
+# ORACLE_HOME=/opt/oracle/instantclient/
+```
 
 ### 6. Subir os Containers
 
-Na raiz do projeto, execute o comando:
+6.1. Na raiz do projeto, execute o comando para buildar os containers e verificar se não ocorreu erro:
 
+```bash
+./vendor/bin/sail build --no-cache
+```
+
+6.2. Se o build ocorreu sem problemas, agora é hora de subir os containers (-d pra manter as requisições do sail em segundo plano):
 ```bash
 ./vendor/bin/sail up -d
 ```
 
-Espere o processo de build ser concluído.
+Espere o processo de criação ser concluído.
 
 ### 7. Instale os pacotes do Yajra pra identificar o banco oracle:
 ```bash
